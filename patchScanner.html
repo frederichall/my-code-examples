@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Patch Scanner</title>
+  <meta charset="utf-8">
+  
+  <link href="/styles/kendo.common.min.css" rel="stylesheet">
+  <link href="/styles/kendo.rtl.min.css" rel="stylesheet">
+  <link href="/styles/kendo.lps.min.css" rel="stylesheet">
+  <link href="/styles/kendo.dataviz.min.css" rel="stylesheet">
+  <link href="/styles/kendo.dataviz.default.min.css" rel="stylesheet">
+  <link href="/styles/lps.default.css" rel="stylesheet">
+  
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/kendo.all.min.js"></script>
+  <script src="/data/ipcollection.js"></script>
+    
+</head>
+<body>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div id="navigation">
+  <div id="navigationBody">
+    <!-- Left-top panel -->
+    <div>
+      <div class="logo-patchscanner"><img src="/img/LogoPatchScanner.png" class="logo-patchscanner-position" /></div>
+    	<div id="treeview"></div>
+    </div>
+    
+    <!-- Left-mid panel -->
+    <div id="gridComputers"></div>
+    
+    <!-- Left-bottom panel -->
+    <div id="moreInfoContainer" class="nav-item">
+    	<div id="moreInformation" class="nav-item-up">More Information</div>
+      <div id="freeTrial" class="nav-item-link">Free trial &raquo;</div>
+      <div id="buyNow" class="nav-item-link">Buy now &raquo;</div>
+    </div>
+  </div> <!-- navigationBody -->
+
+  <div id="verticalBody">
+    
+    <div id="verticalBodyHeader">
+      <div class="assessment-container"> 
+        <div class="title-page">Lumension assessment score</div>
+        <table class="title-subpage">
+        <tr>
+          <td>Computers selected:</td>
+          <td class="table-list-value">48</td>
+        </tr>
+        <tr>
+          <td>Unpatched vulnerabilities:</td>
+          <td class="table-list-value">30</td>
+        </tr>
+        <tr>
+          <td>Last completed scan:</td>
+          <td class="table-list-value">10/09/1024 11:13 AM</td>
+        </tr>
+        </table>
+      </div>
+      <div class="assessment-container-score">
+        <div class="assessment-score-red" title="Relative patch compliance is based on patches applied versus patches applicable">84</div>
+      </div>
+      <div class="logo-company"><img src="/img/LogoLumension.png" /></div>
+    </div> <!-- verticalBodyHeader -->
+    
+    <div id="verticalBodyNavigation">
+        <div class="icons-nav-container">
+          <!-- <img src="/img/navHome_16.png" title="Home" class="icons-nav" /> -->
+          <img src="/img/navPrinter_16.png" title="Print" class="icons-nav" />
+          <!-- <img src="/img/navEmail_16.png" title="Email" class="icons-nav" /> -->
+          <!-- <img src="/img/navSettings_16.png" title="Settings" class="icons-nav" /> -->
+          <!-- <img src="/img/navHelp_16.png" title="Help" class="icons-nav" /> -->
+          <img id="deleteData" src="/img/navDeleteData_16.png" title="Clear results" class="icons-nav" />
+        </div>
+        <div class="logout-container">
+          First Last | <a href="javascript:void(0)" class="text-logout">Logout</a>
+        </div>
+    </div> <!-- verticalBodyNavigation -->
+    
+    <div id="horizontalBodyCharts">
+    	<div>
+        <div id="chartPatched" class="container-chart"></div>
+        <div id="chartUpdates" class="container-chart"></div>
+      </div>
+      <div class="container-marketing">
+      	<div id="marketingSection"><img src="/img/freeTrial.png" /></div>
+        
+        <div class="container-socialmedia"> 
+          <!-- LinkedIn widget -->
+					<script src="//platform.linkedin.com/in.js" type="text/javascript">
+            lang: en_US
+          </script>
+          <script type="IN/Share" data-url="https://www.lumension.com/Resources/Security-Tools/Vulnerability-Scanner.aspx"></script>         
+          
+          <!-- Twitter widget -->
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://www.lumension.com/Resources/Security-Tools/Vulnerability-Scanner.aspx" data-text="I just scanned my environment using the free @_Lumension Patch Scanner! Try it yourself at" data-count="none" data-hashtags="PatchTuesday">Tweet</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          
+          <!-- Facebook widget -->
+          <div class="fb-share-button" data-layout="button" data-href="https://www.lumension.com/Resources/Security-Tools/Vulnerability-Scanner.aspx"></div>
+           
+          <!-- Google + -->
+          <div class="g-plus" data-action="share" data-annotation="none" data-href="https://www.lumension.com/Resources/Security-Tools/Vulnerability-Scanner.aspx"></div>
+          <script type="text/javascript">
+            (function() {
+              var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+              po.src = 'https://apis.google.com/js/platform.js';
+              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+            })();
+          </script>
+        </div>
+      </div>
+    </div> <!-- horizontalBodyCharts -->
+  
+    <div id="verticalBodyMiddle">
+      
+      <!-- Tabs -->
+      <div class="tab-background">
+        <div id="tabPatches" class="tab-selected">Patches</div>
+        <div id="tabPatchesBorder" class="tab-selected-border1"></div>
+        
+        <div id="tabInventory" class="tab-notselected">Inventory</div>
+        <div id="tabInventoryBorder" class="tab-notselected-border2"></div>
+        
+      </div>
+      
+      <!-- Button bar -->
+      <div class="toolbar">
+        <div id="buttonbarText" class="text-buttonbar">0 applicable patches displayed</div>
+        <div class="container-buttonbar">
+          <div class="button-toolbar icon-export">Export</div>
+        </div>
+      </div>
+      <div id="gridPatches" style="display:block"></div>
+      <div id="gridInventory" style="display:none"></div>
+
+    </div>
+    
+    <div id="verticalBodyBottom">
+      &copy; 2000-2014 Lumension Security, Inc. all rights reserved.
+    </div>
+
+  </div>
+
+</div>
+
+<style scoped>
+
+	#navigationBody
+	{
+		height:100%;
+		width:100%;
+		background-color:#f0f0f0;
+	}
+	#verticalBody
+	{
+		height:100%;
+		width:100%;
+	}
+	#verticalBodyHeader
+	{
+		background-color:#f0f0f0;
+	}
+	#verticalBodyNavigation
+	{
+		background-color:#333333; 
+		height:30px; 
+		width:100%;
+	}
+	#navigation
+	{
+		height:100%;
+		width:100%;
+	}
+	#horizontalBodyCharts
+	{
+		overflow:hidden;
+	}
+	#verticalBodyMiddle
+	{
+		overflow:hidden;
+	}
+	#marketingSection
+	{
+		margin-top:25px;
+		cursor:pointer;
+	}
+	#verticalBodyBottom
+	{
+		background-color:#f0f0f0; 
+		text-align:center; 
+		line-height:30px; 
+		font-size:110%;
+	}
+	#treeview
+	{
+		height:150px; 
+		min-height:150px; 
+		overflow:auto; 
+		padding:5px; 
+		border-top:solid 1px #cccccc;
+	}
+	#gridComputers
+	{
+			border-width:0;
+			height:100%;
+			cursor:pointer;
+	}	
+	#gridPatches
+	{
+			border-width:0;
+			height:100%;
+	}
+	#gridInventory
+	{
+			border-width:0;
+			height:100%;
+	}
+	#moreInfoContainer 
+	{
+		overflow:hidden;
+	}
+	#autoComplete::-ms-clear { display: none; }
+	
+.button-close 
+{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.delete-confirm 
+{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.delete-cancel 
+{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.button-dialog 
+{
+    text-align: right;
+}
+.modal-dialog-header-message 
+{
+    font-size: 150%;
+    padding: 10px;
+}
+.modal-dialog-message
+{
+	padding-left:10px;
+	padding-bottom:10px;
+}
+.modal-dialog-container 
+{
+    width: 400px;
+}
+</style>
+
+
+<script>
+   
+	$(document).ready(function () {
+
+		closeButton = $("#closeButton").kendoButton({
+		    enable: true
+		}).data("kendoButton");
+    
+		yesButton = $("#yesButton").kendoButton({
+				enable: true
+		}).data("kendoButton");
+		
+		noButton = $("#noButton").kendoButton({
+		    enable: true
+		}).data("kendoButton");
+	});
+	
+	$(window).load(function(){
+
+		// displayNoResultsMessage();
+		
+	});
+		
+	$(window).resize(function(){
+			resizeGrid();
+			resizeGridComputers();
+			resizeGridInventory();
+	});
+	
+	$("#marketingSection").click(function(){
+		window.open(
+  		'https://www.lumension.com/vulnerability-management/patch-management-software/free-trial/total-track.aspx',
+  		'_blank'
+		);
+	});
+	
+	$("#freeTrial").click(function(){
+		window.open(
+  		'https://www.lumension.com/vulnerability-management/patch-management-software/free-trial/total-track.aspx',
+  		'_blank'
+		);
+	});
+	
+	$("#buyNow").click(function(){
+		window.open(
+  		'https://www.lumension.com/endpoint-management-security-suite/buy-now.aspx#2',
+  		'_blank'
+		);
+	});
+	
+	var displayMoreInfo = false;
+	$("#moreInformation").click(function(){
+		var splitter = $("#navigationBody").data("kendoSplitter");
+		if (displayMoreInfo)
+		{
+			splitter.size(".k-pane:last", "30px");
+			displayMoreInfo = false;
+			document.getElementById("moreInformation").className = "nav-item-up";
+		}
+		else
+		{
+			splitter.size(".k-pane:last", "81px");
+			displayMoreInfo = true;
+			document.getElementById("moreInformation").className = "nav-item-down";
+		}
+	});
+	
+	var ageTypes = [
+		{ text: "Critical < 30", value: "Critical < 30" },
+		{ text: "Critical 30 - 120", value: "Critical 30 - 120" },
+		{ text: "Critical > 120", value: "Critical > 120" }
+	];
+	
+  $("#tabInventory").click(function(){
+		$('#gridPatches').css({display:'none'});
+		$('#gridInventory').css({display:'block'});
+		document.getElementById("tabInventory").className = "tab-selected";
+		document.getElementById("tabInventoryBorder").className = "tab-selected-border2";
+		document.getElementById("tabPatches").className = "tab-notselected";
+		document.getElementById("tabPatchesBorder").className = "tab-notselected-border1";
+		document.getElementById("buttonbarText").innerHTML = "0 applications found";
+  });
+	
+  $("#tabPatches").click(function(){
+		$('#gridInventory').css({display:'none'});
+		$('#gridPatches').css({display:'block'});
+		document.getElementById("tabPatches").className = "tab-selected";
+		document.getElementById("tabPatchesBorder").className = "tab-selected-border1";
+		document.getElementById("tabInventory").className = "tab-notselected";
+		document.getElementById("tabInventoryBorder").className = "tab-notselected-border2";
+		document.getElementById("buttonbarText").innerHTML = "184 applicable patches displayed";
+  })
+	
+	$("#navigation").kendoSplitter({
+			panes: [
+					{ collapsible: true, resizable: true, size: "220px", max: "400px", min: "180px" },
+					{ collapsible: false, resizable: true }
+			]
+	});
+	
+	$("#navigationBody").kendoSplitter({
+			orientation: "vertical",
+			panes: [
+			    { collapsible: false, resizable: false, size: "280px" },
+					{ collapsible: false, resizable: false },
+					{ collapsible: false, resizable: false, size: "30px" }
+			],
+			resize: function() {window.setTimeout(function(){ resizeGridComputers(); }, 1);}
+	});
+	
+	$("#verticalBody").kendoSplitter({
+			orientation: "vertical",
+			panes: [
+			    { collapsible: false, resizable: false, size: "85px" },
+					{ collapsible: false, resizable: false, size: "30px" },
+					{ collapsible: false, resizable: false, size: "340px" },
+					{ collapsible: false, resizable: false },
+					{ collapsible: false, resizable: false, size: "30px" }
+			],
+			resize: function() { 
+				window.setTimeout(function(){ resizeGrid(); }, 1);
+				window.setTimeout(function(){ resizeGridInventory(); }, 1); 
+			}
+	});
+
+	$("#horizontalBodyCharts").kendoSplitter({
+			panes: [
+					{ collapsible: false, resizable: false },
+					{ collapsible: false, resizable: false, size: "260px" }
+			]
+	});
+
+	$("#treeview").kendoTreeView({
+			dataSource: ipDefault
+	});
+
+	$("#gridComputers").kendoGrid({
+		dataSource: {
+			data: computers,
+			schema: {
+				model: {
+					fields: {
+						ComputerName: { type: "string" },
+						ComputerIP: { type: "string" }
+					}
+				}
+			},
+			pageSize: 50
+		},
+		selectable: true,
+		pageable: false,
+		reorderable: false,
+		resizable: true,
+		sortable: true,
+		dataBound: resizeGridComputers,
+		columns: [
+			{ field: "ComputerName", title: "Computer Name" },
+			{ field: "ComputerIP", title: "IP Address" }
+		]
+	});	
+
+	$("#gridPatches").kendoGrid({
+		dataSource: {
+			data: patches,
+			schema: {
+				model: {
+					fields: {
+						PatchID: { type: "string" },
+						PatchName: { type: "string" },
+						PatchCritical: { type: "string" },
+						PatchComputers: { type: "number" }
+					}
+				}
+			}
+		},
+		filterable: {
+			extra: false,
+			operators: {
+					string: {
+						contains: "Contains",
+						doesnotcontain: "Doesn't contain",
+						eq: "Is equal to",
+            neq: "Is not equal to",
+						startswith: "Starts with",
+						endswith: "Ends with"
+					}
+			}
+		},
+		selectable: false,
+		pageable: false,
+		reorderable: false,
+		resizable: true,
+		sortable: true,
+		dataBound: resizeGrid,
+		columns: [
+			{ field: "PatchName", title: "Patch Name", filterable: true, template: "<a href='http://leic.lumension.com/patches/2014/#= PatchID #.html'>#= PatchName #</a>" },
+			{ 
+				field: "PatchCritical", 
+				title: "Age", 
+				width: "110px", 
+				filterable: {
+					ui: ageFilter,
+					extra: false,
+					operators: {
+						string: {
+							eq: "Is equal to",
+						}
+					}
+				}
+			},
+			{ field: "PatchComputers", title: "Computers Not Patched", width: "170px", filterable: true, template: "<div style='text-align:right; padding-right:10px;'>#= PatchComputers #</div>" }
+		]
+	});
+	    
+	function ageFilter(element) 
+	{
+		element.kendoDropDownList({
+			dataTextField: "text",
+			dataValueField: "value",
+			dataSource: ageTypes,
+			optionLabel: "--Select One--"
+		});
+	}
+	
+	$("#gridInventory").kendoGrid({
+		dataSource: {
+			data: inventory,
+			schema: {
+				model: {
+					fields: {
+						InventoryID: { type: "string" },
+						InventoryName: { type: "string" },
+						InventoryComputers: { type: "number" }
+					}
+				}
+			}
+		},
+		filterable: {
+			extra: false,
+			operators: {
+					string: {
+						contains: "Contains",
+						doesnotcontain: "Doesn't contain",
+						eq: "Is equal to",
+            neq: "Is not equal to",
+						startswith: "Starts with",
+						endswith: "Ends with"
+					}
+			}
+		},
+		selectable: false,
+		pageable: false,
+		reorderable: false,
+		resizable: true,
+		sortable: true,
+		dataBound: resizeGridInventory,
+		columns: [
+			{ field: "InventoryName", title: "Software Name", filterable: true },
+			{ field: "InventoryComputers", title: "Computers With Software", width: "170px", filterable: true, template: "<div style='text-align:right; padding-right:10px;'>#= InventoryComputers #</div>" }
+		]
+	});
+	
+	function resizeGrid()
+	{
+		var gridElement = $("#gridPatches"),
+				dataArea = gridElement.find(".k-grid-content"),
+				gridHeight = gridElement.innerHeight(),
+				otherElements = gridElement.children().not(".k-grid-content"),
+				otherElementsHeight = 69;
+		otherElements.each(function(){
+				otherElementsHeight += $(this).outerHeight();
+		});
+		dataArea.height(gridHeight - otherElementsHeight);
+	}
+	
+	function resizeGridComputers()
+	{
+		var gridElement = $("#gridComputers"),
+				dataArea = gridElement.find(".k-grid-content"),
+				gridHeight = gridElement.innerHeight(),
+				otherElements = gridElement.children().not(".k-grid-content"),
+				otherElementsHeight = 0;
+		otherElements.each(function(){
+				otherElementsHeight += $(this).outerHeight();
+		});
+		dataArea.height(gridHeight - otherElementsHeight);
+	}
+	
+	function resizeGridInventory()
+	{
+		var gridElement = $("#gridInventory"),
+				dataArea = gridElement.find(".k-grid-content"),
+				gridHeight = gridElement.innerHeight(),
+				otherElements = gridElement.children().not(".k-grid-content"),
+				otherElementsHeight = 69;
+		otherElements.each(function(){
+				otherElementsHeight += $(this).outerHeight();
+		});
+		dataArea.height(gridHeight - otherElementsHeight);
+	}
+	
+	function createChart() {
+	    $("#chartPatched").kendoChart({
+				title: {
+					position: "top",
+					text: "Patch Compliance",
+					color: "#333333"
+				},
+				legend: {
+					visible: false
+				},
+				chartArea: {
+					background: ""
+				},
+				seriesDefaults: {
+					labels: {
+						position: "center",
+	       		font: "14px segoe ui",
+						color: "#ffffff",
+						visible: true,
+						background: "transparent",
+						template: "#= category #: \n #= value#%"
+					}
+				},
+				series: [{
+					type: "pie",
+					padding: 0,
+					overlay: {
+            gradient: "none"
+        	},
+					startAngle: 100,
+					data: [{
+						category: "154",
+						value: 84,
+						color: "#336699"
+					},{
+						category: "30",
+						value: 16,
+						color: "#cc0000"
+					}]
+				}],
+				tooltip: {
+					visible: false
+				}
+		});
+		
+		$("#chartUpdates").kendoChart({
+			title: {
+				text: "Age of Unresolved Updates",
+				color: "#333333"
+			},
+			legend: {
+				position: "bottom",
+				visible: false				
+			},
+			seriesDefaults: {
+				type: "column"
+			},
+			series: [{
+				overlay: {
+          gradient: "none"
+        },
+				labels: {
+    			visible: true,
+    			position: "top",
+					background: "transparent",
+					font: "14px segoe ui",
+					color: "#ffffff"
+				},
+				name: "< 30 days",
+				color: "#cc0000",
+				data: [10]
+			}, {
+				overlay: {
+          gradient: "none"
+        },
+				labels: {
+    			visible: true,
+    			position: "top",
+					background: "transparent",
+					font: "14px segoe ui",
+					color: "#ffffff"
+				},
+				name: "30 - 120 days",
+				color: "#cc0000",
+				data: [12]
+			}, {
+				overlay: {
+          gradient: "none"
+        },
+				labels: {
+    			visible: true,
+    			position: "top",
+					background: "transparent",
+					font: "14px segoe ui",
+					color: "#ffffff"
+				},
+				name: "> 120 days",
+				color: "#cc0000",
+				data: [8]
+			}],
+			valueAxis: {
+				labels: {
+					format: "{0}"
+				},
+				line: {
+					visible: false
+				},
+				axisCrossingValue: 0
+			},
+			categoryAxis: {
+				categories: ["< 30 days &nbsp; 30 - 120 days &nbsp; > 120 days"],
+				labels: {
+					padding: {top: 0}
+				}
+			},
+			tooltip: {
+				visible: false,
+				format: "{0}",
+				template: "#= series.name #: #= value #"
+			}
+		});
+		
+	}
+
+	$(document).ready(createChart);
+	$(document).bind("kendo:skinChange", createChart);	
+	
+	function displayNoResultsMessage()
+	{
+		var kendoWindow = $("<div />").kendoWindow({
+				title: "Lumension Patch Scanner",
+				resizable: false,
+				modal: true
+		});
+	
+		kendoWindow.data("kendoWindow")
+			.content($("#noDataMessage").html())
+			.center().open();
+	
+		kendoWindow
+			.find(".button-close")
+			.click(function() {
+				kendoWindow.data("kendoWindow").close();
+			})
+		.end()
+	}
+	
+	
+	$("#deleteData").click(function(){
+		confirmClear();
+	});
+	
+	function confirmClear()
+	{
+		var kendoWindow = $("<div />").kendoWindow({
+				title: "Confirm Clear Results",
+				resizable: false,
+				modal: true
+		});
+	
+		kendoWindow.data("kendoWindow")
+			.content($("#deleteConfirmation").html())
+			.center().open();
+	
+		kendoWindow
+			.find(".delete-confirm,.delete-cancel")
+			.click(function() {
+				if ($(this).hasClass("delete-confirm")) {
+					displayNoResultsMessage();
+				}
+				kendoWindow.data("kendoWindow").close();
+			})
+		.end()
+	}
+
+</script>
+
+<script id="noDataMessage" type="text/x-kendo-template">
+	<div class="modal-dialog-container">
+		<div class="modal-dialog-header-message">No results available</div>
+		<div class="modal-dialog-message">
+		To view patch assessment scan results, run the Patch Scan Manager to one or more computers in your network. Once the assessment 
+		scans are complete (up to 50 computers), the results are published to this website. </div>
+		<div class="button-dialog">
+			<button id="closeButton" class="button-close">Close</button>
+		</div>
+	</div>
+</script>
+
+
+<script id="deleteConfirmation" type="text/x-kendo-template">
+	<div class="modal-dialog-container">
+		<div class="modal-dialog-header-message">Are you sure you want to clear all results?</div>
+		<div class="button-dialog">
+			<button id="yesButton" class="delete-confirm">Yes</button>
+			<button id="noButton" class="delete-cancel">No</button>
+		</div>
+	</div>
+</script>
+
+</body>
+</html>
